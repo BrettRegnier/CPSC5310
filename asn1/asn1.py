@@ -8,8 +8,10 @@ from nltk.stem.wordnet import WordNetLemmatizer
 from nltk.stem import PorterStemmer
 
 
-def PrintTagandVocabCount(words):
-
+def PrintDetails(category, words):
+    print("Category:", category)
+    print("Token count:", len(words))
+    
     # get tags via nltk
     tags = nltk.pos_tag(words)
 
@@ -34,12 +36,8 @@ def PrintTagandVocabCount(words):
         if unique:
             ltags.append([tag, 1])
 
-    # print("tags:", ltags) # debug
-    print("unique tag count:", len(ltags))
-
-    vocab = Vocabulary(words)
-    # print(vocab.counts) # debug
-    print("vocabulary size:", len(vocab.counts))
+    print("Word-type count:", len(ltags))
+    print("Vocabulary size:", len(set(words)))
     print("")
 
 
@@ -51,10 +49,7 @@ stopwords = stopwords.words('english')
 print("----- Brown details with stopwords -----")
 for c in brown.categories():
     words = brown.words(categories=c)
-    print("category:", c)
-    print("word count:", len(words))
-
-    PrintTagandVocabCount(words)
+    PrintDetails(c, words)
 
 print("----- Brown details WITHOUT stopwords -----")
 for c in brown.categories():
@@ -64,11 +59,8 @@ for c in brown.categories():
     for w in words:
         if w not in stopwords:
             filtered.append(w)
-
-    print("category:", c)
-    print("word count:", len(filtered))
-
-    PrintTagandVocabCount(filtered)
+            
+    PrintDetails(c, filtered)
 
 print("----- Brown details WITHOUT stopwords and lemmatization -----")
 for c in brown.categories():
@@ -80,11 +72,8 @@ for c in brown.categories():
         w = lemmatizer.lemmatize(word)
         if w not in stopwords:
             filtered.append(w)
-
-    print("category:", c)
-    print("word count:", len(filtered))
-
-    PrintTagandVocabCount(filtered)
+            
+    PrintDetails(c, filtered)
 
 print("----- Brown details WITHOUT stopwords and stemming -----")
 for c in brown.categories():
@@ -97,7 +86,4 @@ for c in brown.categories():
         if w not in stopwords:
             filtered.append(w)
 
-    print("category:", c)
-    print("word count:", len(filtered))
-
-    PrintTagandVocabCount(filtered)
+    PrintDetails(c, filtered)
