@@ -3,10 +3,14 @@ from collections import Counter
 import nltk
 from nltk.corpus import brown
 from nltk.corpus import stopwords
-from nltk.lm import Vocabulary
 from nltk.stem.wordnet import WordNetLemmatizer
 from nltk.stem import PorterStemmer
 
+# make sure that everything for nltk is installed.
+nltk.download('stopwords')
+nltk.download('brown')
+nltk.download('averaged_perceptron_tagger')
+nltk.download('wordnet')
 
 def PrintDetails(category, words):
     print("Category:", category)
@@ -37,11 +41,12 @@ def PrintDetails(category, words):
             ltags.append([tag, 1])
 
     print("Word-type count:", len(ltags))
-    print("Vocabulary size:", len(set(words)))
+    print("Vocabulary size of category:", len(set(words)))
     print("")
 
 
 stopwords = stopwords.words('english')
+print("Vocabulary size of the whole corpus:", len(set(brown.words())))
 
 # Note. I loop through the categories multiple times because I want
 # to keep the questions seperated.
@@ -87,3 +92,5 @@ for c in brown.categories():
             filtered.append(w)
 
     PrintDetails(c, filtered)
+    
+print("Vocabulary size of the whole corpus:", len(set(brown.words())))
