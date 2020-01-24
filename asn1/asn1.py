@@ -25,7 +25,7 @@ def PrintDetails(category, words):
 
     # loop through all tags
     for t in tags:
-        tag = t[1]  # get the tag from object
+        tag = t[1].lower()  # get the tag from object
 
         # bool for if the tag should be appended to the list of tags
         unique = True
@@ -33,7 +33,7 @@ def PrintDetails(category, words):
         # loop through current list of tags
         for li in ltags:
             # tag is not unique
-            if li[0] == tag:
+            if li[0].lower() == tag:
                 unique = False
                 li[1] += 1
                 break
@@ -42,7 +42,6 @@ def PrintDetails(category, words):
             ltags.append([tag, 1])
 
     print("Word-type count: ", len(ltags))
-    print(tags)
     print("Vocabulary size of category: ", len(set(words)))
     print("")
 
@@ -76,7 +75,7 @@ for c in brown.categories():
     lemmatizer = WordNetLemmatizer()
     for word in words:
         w = lemmatizer.lemmatize(word)
-        if w not in stopwords:
+        if w.lower() not in stopwords:
             filtered.append(w)
 
     PrintDetails(c, filtered)
@@ -89,7 +88,7 @@ for c in brown.categories():
     stemmer = PorterStemmer()
     for word in words:
         w = stemmer.stem(word)
-        if w not in stopwords:
+        if w.lower() not in stopwords:
             filtered.append(w)
 
     PrintDetails(c, filtered)
