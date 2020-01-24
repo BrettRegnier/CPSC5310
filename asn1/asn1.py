@@ -1,21 +1,22 @@
-from collections import Counter
-
 import nltk
-from nltk.corpus import brown
-from nltk.corpus import stopwords
-from nltk.stem.wordnet import WordNetLemmatizer
-from nltk.stem import PorterStemmer
-
 # make sure that everything for nltk is installed.
 nltk.download('stopwords')
 nltk.download('brown')
 nltk.download('averaged_perceptron_tagger')
 nltk.download('wordnet')
 
+# import downloaded
+from nltk.stem import PorterStemmer
+from nltk.stem.wordnet import WordNetLemmatizer
+from nltk.corpus import stopwords
+from nltk.corpus import brown
+from collections import Counter
+
+
 def PrintDetails(category, words):
-    print("Category:", category)
-    print("Token count:", len(words))
-    
+    print("Category: ", category)
+    print("Token count: ", len(words))
+
     # get tags via nltk
     tags = nltk.pos_tag(words)
 
@@ -40,23 +41,23 @@ def PrintDetails(category, words):
         if unique:
             ltags.append([tag, 1])
 
-    print("Word-type count:", len(ltags))
-    print("Vocabulary size of category:", len(set(words)))
+    print("Word-type count: ", len(ltags))
+    print(tags)
+    print("Vocabulary size of category: ", len(set(words)))
     print("")
 
 
 stopwords = stopwords.words('english')
-print("Vocabulary size of the whole corpus:", len(set(brown.words())))
 
 # Note. I loop through the categories multiple times because I want
 # to keep the questions seperated.
 
-print("----- Brown details with stopwords -----")
+print("----- a) Brown details with stopwords -----")
 for c in brown.categories():
     words = brown.words(categories=c)
     PrintDetails(c, words)
 
-print("----- Brown details WITHOUT stopwords -----")
+print("----- b) Brown details WITHOUT stopwords -----")
 for c in brown.categories():
     words = brown.words(categories=c)
 
@@ -64,10 +65,10 @@ for c in brown.categories():
     for w in words:
         if w not in stopwords:
             filtered.append(w)
-            
+
     PrintDetails(c, filtered)
 
-print("----- Brown details WITHOUT stopwords and lemmatization -----")
+print("----- c) Brown details WITHOUT stopwords and lemmatization -----")
 for c in brown.categories():
     words = brown.words(categories=c)
 
@@ -77,10 +78,10 @@ for c in brown.categories():
         w = lemmatizer.lemmatize(word)
         if w not in stopwords:
             filtered.append(w)
-            
+
     PrintDetails(c, filtered)
 
-print("----- Brown details WITHOUT stopwords and stemming -----")
+print("----- d) Brown details WITHOUT stopwords and stemming -----")
 for c in brown.categories():
     words = brown.words(categories=c)
 
@@ -92,5 +93,5 @@ for c in brown.categories():
             filtered.append(w)
 
     PrintDetails(c, filtered)
-    
+
 print("Vocabulary size of the whole corpus:", len(set(brown.words())))
