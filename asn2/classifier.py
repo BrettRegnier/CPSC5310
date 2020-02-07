@@ -7,32 +7,26 @@ import nltk
 nltk.download("brown")  # just incase
 
 
-# TODO
-# Take each word from each category and classify them as their category.
-# train the naive bayes
-# Feed in a whole document and let it classify what category
-
-# OR Tokenize each word in a text, from the brown corpus, and take its category and create training data from that
-# similar to how the examples in class are. From there we can feed in texts that need to be classified. Should work better.
-
 def main():
     features = None
     shuffles = 0
-    
+
     choice = ""
     while choice != "exit":
         choice = ""
         while choice not in ["run", "exit"]:
-            choice = input("Would you like to classify the Brown corpus? [Run, Exit]\n>").lower()
-        
+            choice = input(
+                "Would you like to classify the Brown corpus? [Run, Exit]\n>").lower()
+
         if choice == "exit":
             break
 
         shuffles = 0
         while shuffles < 1 or shuffles > 100:
-            shuffles = int(input("How many times would you like to shuffle and run? [1-100]\n>"))
+            shuffles = int(
+                input("How many times would you like to shuffle and run? [1-100]\n>"))
             print("")
-    
+
         # Create features if not already made
         if features is None:
             print("Creating features...")
@@ -55,8 +49,9 @@ def main():
             print("  Training set:", len(trainingData), "items")
             print("  Testing set:", len(testingData), "items")
             print("  Classifying testing data...")
-            accuracy = nltk.classify.accuracy(classifier, testingData) * 100 # turn into percent.
-            print("  Accuracy:", "{0:.4f}".format(round(accuracy,4)) + "%")
+            # turn into percent.
+            accuracy = nltk.classify.accuracy(classifier, testingData) * 100
+            print("  Accuracy:", "{0:.4f}".format(round(accuracy, 4)) + "%")
             print("")
 
 
@@ -65,18 +60,26 @@ def CreateFeatures():
     sw = stopwords.words('english')
     lemmatizer = WordNetLemmatizer()
     stemmer = PorterStemmer()  # yielded an extra 0.1% so I kept it in.
-    
+
+    # get the categories in brown
     for c in brown.categories():
+        # get the files in a category
         for d in brown.fileids(categories=c):
+            # get words from a file
             words = brown.words(fileids=d)
+
+            # extracted words of a document appended together.
             extracted_words = ""
+
+            # filter each word
             for w in words:
                 w = lemmatizer.lemmatize(w)
                 w = stemmer.stem(w)
                 if (w not in sw) and (w.isalnum()):
+                    # append until we have the filtered document recreated
                     extracted_words += w.lower() + " "
-                    # feature_words.append({"w": w, "c": c})
-                    # tokens.append(w)
+
+                # create features and add them to a feature set.
                 feature = ({"words": extracted_words}, c)
                 features.append(feature)
 
