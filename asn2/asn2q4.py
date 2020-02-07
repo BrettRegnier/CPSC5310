@@ -28,8 +28,9 @@ def main():
 
         shuffles = 0
         while shuffles < 1 or shuffles > 100:
-            shuffles = int(
-                input("How many times would you like to shuffle and run? [1-100]\n>"))
+            inp = input("How many times would you like to shuffle and run? [1-100]\n>")
+            if inp.isnumeric():
+                shuffles = int(inp)
             print("")
 
         # Create features if not already made

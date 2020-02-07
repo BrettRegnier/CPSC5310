@@ -27,7 +27,9 @@ def main():
 
         gen = 0
         while gen < 1 or gen > 100:
-            gen = int(input("How many sentences to generate? [1-100]\n>"))
+            inp = input("How many times would you like to shuffle and run? [1-100]\n>")
+            if inp.isnumeric():
+                gen = int(inp)
             print("")
 
 
