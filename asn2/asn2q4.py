@@ -1,10 +1,15 @@
+import nltk
+# make sure that everything for nltk is installed.
+nltk.download("brown") 
+nltk.download('stopwords')
+nltk.download('averaged_perceptron_tagger')
+nltk.download('wordnet')
+
 from nltk.corpus import stopwords
 from nltk.stem import PorterStemmer
 from nltk.stem.wordnet import WordNetLemmatizer
 from nltk.corpus import brown
 import random
-import nltk
-nltk.download("brown")  # just incase
 
 
 def main():
