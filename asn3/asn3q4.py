@@ -143,7 +143,7 @@ def TF_IDF(docs, appearVec):
     num_docs = len(docs)
     for doc in docs:
         if doc not in tfidf_matrix:
-            tfidf_matrix[doc] = {}
+                                                           tfidf_matrix[doc] = {}
         for word in docs[doc]:
             if word not in tfidf_matrix[doc]:
                 for d in docs:
