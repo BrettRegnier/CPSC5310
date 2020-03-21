@@ -21,7 +21,6 @@ def main():
 
     word2vec = None
 
-    # TODO normalize the data, and build matrix of docs, with their words, frequencies, and appearances
     choice = ""
     while choice != "exit":
         choice = ""
@@ -29,15 +28,32 @@ def main():
             choice = input("TF-IDF or Word2Vec? [TFIDF, Word2Vec, Exit]\n>").lower()
         
         if choice == "exit":
+            break        
+        
+        catType = ""
+        while catType not in ["within", "between", "return"]:
+            catType = input("Within or between clusters? [Within, Between, Return]\n>").lower()
+        
+        if catType == "return":
             break
 
         # get all of the words for each document per category
         texts = []
-        for c in brown.categories():
-            words = NormalizeWords(brown.words(categories=c))
-            texts.append(words)
-            # build a dictionary for me to use later
-            browndict[c] = words
+        if catType == "within":
+            for c in brown.categories():
+                words = NormalizeWords(brown.words(categories=c))
+                texts.append(words)
+                # build a dictionary for me to use later
+                browndict[c] = words
+        elif catType == "between":
+            for c in brown.categories():
+                words = NormalizeWords(brown.words(categories=c))
+                texts.append(words[:len(words)//2])
+                texts.append(words[len(words)//2:])
+                # build a dictionary for me to use later
+                browndict[c+"1"] = words[:len(words)//2]
+                browndict[c+"2"] = words[len(words)//2:]
+
 
         # create the corpora dictionary built from gensim
         corporadict = corpora.Dictionary(texts)
@@ -110,12 +126,12 @@ def main():
                     if sim > mx:
                         mx = sim
                         s = keys[i] + " and " + keys[j]
-                    print(keys[i], "and", keys[j], "have a similarity of:",sim)
+                    print(keys[i], "is", keys[j], "have a similarity of:",sim)
                 maxes[s] = mx
                 i += 1
         
         for key in maxes:
-            print("Max similarity", key, "=", maxes[key])
+            print("Max similarity for", key, "=", maxes[key])
 
 def NormalizeWords(words):
     tokens = []
