@@ -18,7 +18,6 @@ def main():
 
     # prepare the data
     print("Normalizing words from each document given their categories...")
-    largest_doc = 0
     docs_vec = []
     docs_cat = []
     for c in brown.categories():
@@ -27,10 +26,15 @@ def main():
             docs_vec.append(doc)
             docs_cat.append((doc, c))
 
+    # for c in brown.categories():
+    #     doc = NormalizeWords(brown.words(categories=c))
+    #     docs_vec.append(doc)
+    #     docs_cat.append((doc, c))
+
     # TODO add epochs and size changes to w2v
     print("Training Word2Vec...")
-    # word2vec = Word2Vec(docs_vec, size=200, iter=500, workers=8)
-    # word2vec.save("w2v.model")
+    word2vec = Word2Vec(docs_vec, size=10, iter=100, workers=4)
+    word2vec.save("w2v.model")
     word2vec = Word2Vec.load("w2v.model")
     
     print("Generating acceptable input for models...")
@@ -42,6 +46,8 @@ def main():
         for w in d:
             if w in word2vec.wv.vocab:
                 mean.append(word2vec.wv.get_vector(w))
+            else:
+                mean.append(0)
         mean = np.array(mean)
         w2v_docs_cats.append((mean.mean(axis=0), c))
     
@@ -52,7 +58,7 @@ def main():
         w2v_docs.append(d)
         w2v_cats.append(c)
 
-    siz = int(len(w2v_docs) * .90)
+    siz = int(len(w2v_docs) * .70)
     train_X, train_y = w2v_docs[:siz], w2v_cats[:siz]
     test_X, test_y = w2v_docs[siz:], w2v_cats[siz:]
 
@@ -63,7 +69,7 @@ def main():
     # print(lg.score(test_X, test_y))
 
     print("Training the Neural Network Model...")
-    clf = MLPClassifier(hidden_layer_sizes=(2, 2, 2), activation="relu", solver="adam", max_iter=100000000, learning_rate_init=0.001, verbose=True, validation_fraction=0.0001, early_stopping=False)
+    clf = MLPClassifier(hidden_layer_sizes=(3, 3, 3, 3, 3), activation="logistic", solver="adam", max_iter=100000, learning_rate_init=0.1, learning_rate="adaptive", verbose=True, n_iter_no_change=100)
     clf.fit(train_X, train_y)
     print("Finished training...")
     print(clf.score(test_X, test_y))
