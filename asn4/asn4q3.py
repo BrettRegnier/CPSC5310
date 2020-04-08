@@ -13,6 +13,21 @@ import random
 import numpy as np
 import os
 
+######################################################################################################
+# The goal of this program is to classify texts into categories based on the words of the document. 
+# My program takes each category and gets the words from each file given that category and normaizes the data.
+# Then I get the w2v vector for each document and place them into a list and split the documents into
+# two sets, the training set and the testing set. Each with their correct classified category.
+# 
+# Problem: Since there is very little documents (only 500) to train on, the accuracy for both the logistic regression
+# and Neural Network is quite low due to too little information to train on. 
+#
+# Solution: A larger dataset would be trained on more effectively, however since we are only using the brown corpus it is difficult
+# a potentional solution could be to treat the categories are a bag of words and classify a subset from the bag of words. However,
+# in real world problems a entire corpus wouldn't be classified by taking a BOW, but a document from a corpus would be treated as such instead.
+#
+########################################################################################################
+
 def main():
     word2vec = None
     perceptron = None
@@ -39,24 +54,27 @@ def main():
         word2vec = Word2Vec(docs_vec, size=vec_size, iter=i, workers=4)
         word2vec.save(fil)
     
-    print("Generating acceptable input for models...")
+    print("Generating w2v input for models...")
     w2v_docs = []
     w2v_cats = []
+    # this block checks if the word in a document is in the word2vec model and if it is get the w2v vector for the word
+    # otherwise just fill in zeros for that word.
     for d, c in docs_cat:
         mean = []
         for w in d:
             if w in word2vec.wv.vocab:
                 mean.append(word2vec.wv.get_vector(w))
             else:
-                mean.append(0)
+                mean.append(np.zeros(100))
         mean = np.array(mean).mean(axis=0)
         w2v_docs.append(mean)
         w2v_cats.append(c)
 
-    train_X, test_X, train_y, test_y = train_test_split(w2v_docs, w2v_cats, test_size=.30)
+    # split the documents into training data and test data.
+    train_X, test_X, train_y, test_y = train_test_split(w2v_docs, w2v_cats, test_size=.30, random_state=0)
 
     print("Training the Logistic Regression Model...")
-    lg = LogisticRegression(max_iter=25000)
+    lg = LogisticRegression(max_iter=50000, C=1e5)
     lg.fit(train_X, train_y)
     print("Finished training...")
     score = lg.score(test_X, test_y) * 100
@@ -79,7 +97,7 @@ def NormalizeWords(words):
     for w in words:
         w = lemmatizer.lemmatize(w)
         if (w not in sw) and (w.isalnum()):
-            tokens.append(w)
+            tokens.append(w.lower())
 
     return tokens
 
