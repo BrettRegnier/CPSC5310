@@ -29,7 +29,7 @@ def main():
             docs_cat.append((doc, c))
 
     vec_size = 100
-    i = 500
+    i = 100
     print("Training Word2Vec...")
 
     fil = "w2v_s" + str(vec_size) + "_i_" + str(i) + ".model"
@@ -53,17 +53,17 @@ def main():
         w2v_docs.append(mean)
         w2v_cats.append(c)
 
-    train_X, test_X, train_y, test_y = train_test_split(w2v_docs, w2v_cats, test_size=.30, random_state=42)
+    train_X, test_X, train_y, test_y = train_test_split(w2v_docs, w2v_cats, test_size=.30)
 
     print("Training the Logistic Regression Model...")
-    lg = LogisticRegression(max_iter=10000)
+    lg = LogisticRegression(max_iter=25000)
     lg.fit(train_X, train_y)
     print("Finished training...")
     score = lg.score(test_X, test_y) * 100
     print("Accuracy score for Logisitic Regression:", "%.2f" % score, "%")
 
     print("Training the Neural Network Model...")
-    clf = MLPClassifier(hidden_layer_sizes=(3, 3, 3, 3, 3), activation="relu", solver="adam", max_iter=100000, learning_rate_init=0.001, n_iter_no_change=100)
+    clf = MLPClassifier(hidden_layer_sizes=(3, 3, 3, 3, 3), activation="relu", solver="adam", max_iter=100000, learning_rate_init=0.001, n_iter_no_change=500)
     clf.fit(train_X, train_y)
     print("Finished training...")
     score = clf.score(test_X, test_y) * 100
