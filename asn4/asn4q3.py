@@ -7,9 +7,11 @@ import gensim
 from gensim.models import Word2Vec
 from sklearn.linear_model import LogisticRegression
 from sklearn.neural_network import MLPClassifier
+from sklearn.model_selection import train_test_split
 
 import random
 import numpy as np
+import os
 
 def main():
     word2vec = None
@@ -26,19 +28,18 @@ def main():
             docs_vec.append(doc)
             docs_cat.append((doc, c))
 
-    # for c in brown.categories():
-    #     doc = NormalizeWords(brown.words(categories=c))
-    #     docs_vec.append(doc)
-    #     docs_cat.append((doc, c))
-
-    # TODO add epochs and size changes to w2v
+    vec_size = 100
+    i = 500
     print("Training Word2Vec...")
-    word2vec = Word2Vec(docs_vec, size=10, iter=100, workers=4)
-    word2vec.save("w2v.model")
-    word2vec = Word2Vec.load("w2v.model")
+
+    fil = "w2v_s" + str(vec_size) + "_i_" + str(i) + ".model"
+    if os.path.exists(fil):   
+        word2vec = Word2Vec.load(fil)
+    else:
+        word2vec = Word2Vec(docs_vec, size=vec_size, iter=i, workers=4)
+        word2vec.save(fil)
     
     print("Generating acceptable input for models...")
-    w2v_docs_cats = []
     w2v_docs = []
     w2v_cats = []
     for d, c in docs_cat:
@@ -48,31 +49,25 @@ def main():
                 mean.append(word2vec.wv.get_vector(w))
             else:
                 mean.append(0)
-        mean = np.array(mean)
-        w2v_docs_cats.append((mean.mean(axis=0), c))
-    
-    print("Shuffling and seperating the data...")
-    random.shuffle(w2v_docs_cats)
-
-    for d, c in w2v_docs_cats:
-        w2v_docs.append(d)
+        mean = np.array(mean).mean(axis=0)
+        w2v_docs.append(mean)
         w2v_cats.append(c)
 
-    siz = int(len(w2v_docs) * .70)
-    train_X, train_y = w2v_docs[:siz], w2v_cats[:siz]
-    test_X, test_y = w2v_docs[siz:], w2v_cats[siz:]
+    train_X, test_X, train_y, test_y = train_test_split(w2v_docs, w2v_cats, test_size=.30, random_state=42)
 
     print("Training the Logistic Regression Model...")
-    # lg = LogisticRegression(max_iter=5000)
+    lg = LogisticRegression(max_iter=10000)
+    lg.fit(train_X, train_y)
     print("Finished training...")
-    # lg.fit(train_X, train_y)
-    # print(lg.score(test_X, test_y))
+    score = lg.score(test_X, test_y) * 100
+    print("Accuracy score for Logisitic Regression:", "%.2f" % score, "%")
 
     print("Training the Neural Network Model...")
-    clf = MLPClassifier(hidden_layer_sizes=(3, 3, 3, 3, 3), activation="logistic", solver="adam", max_iter=100000, learning_rate_init=0.1, learning_rate="adaptive", verbose=True, n_iter_no_change=100)
+    clf = MLPClassifier(hidden_layer_sizes=(3, 3, 3, 3, 3), activation="relu", solver="adam", max_iter=100000, learning_rate_init=0.001, n_iter_no_change=100)
     clf.fit(train_X, train_y)
     print("Finished training...")
-    print(clf.score(test_X, test_y))
+    score = clf.score(test_X, test_y) * 100
+    print("Accuracy score for the Neural Network:", "%.2f" % score, "%")
     
 
 def NormalizeWords(words):
